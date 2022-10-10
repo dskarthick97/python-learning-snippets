@@ -1,0 +1,10 @@
+POSSIBILITIES:
+
+S3:
+
+  While Downloading:
+    - where to download to?
+
+  While Uploading:
+    - Upload from?
+    - Upload to same bucket / Upload to different bucket

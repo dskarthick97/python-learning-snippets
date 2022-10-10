@@ -1,0 +1,173 @@
+Pytest - Reference Guide
+
+1. Tests will look like:
+
+    def test_function():
+        x = 3
+        assert x == 4
+
+    class TestClass:
+        def test_function():
+            x = 1
+            assert x == 5
+
+2. Assert Introspection
+
+    def test_assert_introspection():
+        x = y = 0               # with unittest.py
+        assert x                # assertTrue(x)
+        assert x == 1           # assertEqual(x, 1)
+        assert x != 1           # assertNotEqual(x, 2)
+        assert not x            # assertFalse(x)
+        assert x < 3 and y > 5  #?
+
+3. Asserting expected exceptions
+
+    def divide(x, y):
+        return x / y
+
+    def test_raises():
+        with pytest.raises(ZeroDivisionError):
+            divide(3, 0)
+
+4. Some important options
+
+    -s disable capture of stdout / stderr
+    -x exit instantly of first failure
+    -k only run tests whose names matches the given expression
+    --pdb start Python debugger on errors
+
+    For many more options see pytest -h
+
+    Write a test function, play with options
+    Insert print(...) in a failing test. It will print when the test fails. 
+        With -s, we can tell pytest to print for success tests also.
+
+5. Persisting command line options
+
+    - Create a pytest.ini file at the root of the test folders
+        # content of pytest.ini
+        [pytest]
+        addopts = -x  # will be used in all test runs
+
+    - Add some options to addopts variable
+    - For other pytest.ini options at end of pytest -h ouput
+
+6. Fixture function
+
+    - Pytest calls fixtures to inject dependency into a test function
+    - Fixtures are returned from the fixture function
+    - Each fixture has a name (the function name)
+    - Test functions get it injected as an argument by name
+
+    Eg.
+        @pytest.fixture
+        def somevalue():
+            return 42
+
+
+        def test_function(somevalue):
+            assert somevalue == 42
+
+    - Use pytest [file_or_dir] --fixtures
+
+    - For to skip the fixture injection, use skip marker.  By default, the skip 
+        reason won't print it in the console. Use -rs(reason skip) flag to print 
+            the skip reason. Run test_fixture.py file with -rs flag
+        @pytest.fixture
+        def somevalue():
+            pytest.skip("test")
+            return 42
+
+    - Fixtures can be cached on per scope basis
+        Eg.
+            @pytest.fixture(scope="function")
+            def fix():
+                time.sleep(1)
+                return 1
+
+            def test_func(fix):
+                assert fix == 1
+
+            def test_func2(fix):
+                assert fix == 1
+
+            - Issue pytest --durations=10 for additional info. Run test_fixture_scope.py
+                file with durations=10 flag by changing the scopes into module.
+    
+    - Doing cleanup / teardown with a fixture
+        A fixture can use yield instead of return and do some cleanup after tests.
+            @pytest.fixture
+            def fix():
+                a = A()
+                yield a
+                a.finish()  # teardown
+
+            def test_fix(fix):
+                print("in the test")
+
+        Here a.finish() will be called after a test function is finished.
+        Also based on the fixture scope the setup and teardown will happen.
+            Eg. If the scope is function, then the setup and teardown will happen 
+                for every function. And if the scope is module / session, then the 
+                setup and teardown will happen only once.
+
+    - Modularity: Using fixtures from fixtures
+        Fixture function can use other fixtures:
+            @pytest.fixture(params=[10, 20])
+            def answer1(request):
+                return 5 * request.param
+
+            @pytest.fixture
+            def answer2(answer1):
+                return answer1 * 2
+
+    - Fixture function visibility
+        - Fixture methods defined in a class are only available to test methods 
+            on that class.
+        - Fixtures defined in a module are only available to tests in that module.
+        - Fixtures defined in a conftest.py file are available to tests in that 
+            directory and subdirectories.
+        - Fixtures defined in a plugin are available everywhere.
+        - Fixtures don't get imported. pytest autodiscovers them!
+
+    - Builtin fixtures (Refer respective test fixture files)
+        - tmp_path and tmdir: a fresh empty directory for each test invocation
+        - monkeypatch: temporarily modify external state for test duration
+        - capsys and capfd: capturing stdout / stderr in a test
+        - caplog: capturing logging in a test
+
+        - Autouse fixtures
+            If to prepare the test environment before any test is run, a fixture
+                can take autouse=True
+                Eg.
+                    # conftest.py
+                    @pytest.fixture(scope="session", autouse=True)
+                    def db():
+                        db = create_test_db()
+                        return db
+
+                The test db will be created ahead of the first test. We also
+                    return db (which might be the name of the test db, or a 
+                    connection factory) in case a test wants access to it.
+
+        More fixtures are provided by plugins. Use pytest --fixtures to see 
+            available fixtures with docs
+
+    - Fixtures summary
+        - Inject configurable resources into test functions
+        - Interact with tests requiring the resource
+        - Manage life-time / caching scope of resources
+        - Setup resources implicitly (autouse)
+        - (Re-run tests with differently configured resources)
+
+7. Plugins
+
+    - Property based testing: hypothesis
+    - Customized reporting: pytest-html, pytest-slack, pytest-sugar, pytest-instafail
+        pytest-emoji
+    - Repeating tests: pytest-repeat, pytest-rerunfailures, pytest-benchmark
+    - Framework / Language integration: pytest-twisted, pytest-django, pytest-qt
+        , pytest-asyncio, pytest-cpp
+    - Coverage and mock integration: pytest-cov, pytest-mock
+    - Other: pytest-bdd (behaviour-driven testing), pytest-xdist (distributed testing)
