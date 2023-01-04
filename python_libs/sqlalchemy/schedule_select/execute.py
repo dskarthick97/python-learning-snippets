@@ -37,7 +37,7 @@ def execute(source_function):
 # using ORMs Session object
 @execute
 def scheduler_insert(
-        job_name: str, trigger_type: TriggerType, trigger_args: dict
+    job_name: str, trigger_type: TriggerType, trigger_args: dict
 ) -> Scheduler:
     return Scheduler(
         job_name=job_name,
@@ -74,10 +74,10 @@ def track_bulk_insert() -> List[Tracker]:
 
 def main():
     # scheduler_insert("print_welcome", TriggerType.INTERVAL.value, {"seconds": 5})
-    scheduler_bulk_insert()
+    # scheduler_bulk_insert()
 
     # track_bulk_insert()
-    # track_insert(4)
+    track_insert(18)
 
 
 if __name__ == "__main__":

@@ -48,3 +48,6 @@ WHERE
     FROM
       `tracker
   );
+
+-- checking whether a row exists in a table
+SELECT EXISTS (SELECT 1 FROM `scheduler` WHERE `id` = '37' LIMIT 1);

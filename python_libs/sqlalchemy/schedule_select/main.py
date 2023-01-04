@@ -28,24 +28,29 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
-from models import Tracker, Scheduler
+from models import Scheduler, Tracker
 from utils import get_db_env, get_mysql_engine
 
 
 def process(sqlalchemy_engine):
     with Session(sqlalchemy_engine) as session:
         with session.begin():
-            # selecting last row_id from tracker table
             tracker_select_stmt = select(func.max(Tracker.scheduler_id))
             sched_id = session.scalar(tracker_select_stmt)
+            if sched_id is None:
+                sched_id = 0
 
-            # selecting all records after a specific record
-            scheduler_select_stmt = select(Scheduler).where(
-                Scheduler.job_id > sched_id)
+            # sched_id = 37
+            # exists_stmt = select(
+            #     exists(select(1).where(Scheduler.job_id == sched_id).limit(1))
+            # )
+            # is_record_exist = session.scalar(exists_stmt)
+            # print(is_record_exist)
+
+            scheduler_select_stmt = select(Scheduler).where(Scheduler.job_id > sched_id)
             records = session.scalars(scheduler_select_stmt).all()
             print(records)
 
-            # updating the tracker table with last record id
             last_record_id = records[-1].job_id
             session.add(Tracker(scheduler_id=last_record_id))
 
@@ -65,7 +70,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # engine = get_mysql_engine(*get_db_env())
-    # process(engine)
+    engine = get_mysql_engine(*get_db_env())
+    process(engine)
 
-    main()
+    # main()
