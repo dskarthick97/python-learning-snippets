@@ -1,0 +1,48 @@
+REFERENCES
+    - https://medium.com/analytics-vidhya/poetry-finally-an-all-in-one-tool-to-manage-python-packages-3c4d2538e828
+    - https://towardsdatascience.com/python-poetry-83f184ac9ed1
+
+    INSTALLATION:
+        - https://python-poetry.org/docs/#installation
+        - can also `pip install poetry`
+
+    COMMANDS:
+        - `poetry self update` --> updates poetry
+
+        - `poetry new ${project_name}` --> creates a simple project
+        - `poetry init ${project_name}` --> initializing a project manually
+
+        - `poetry add ${package_name}` --> adds dependency
+        - `poetry add --group --dev ${package_name}` --> adds development dependency
+                Not included in the project build
+
+        - `poetry show` --> lists all dependencies
+        - `poetry show --tree` --> lists dependencies as well as the dependencies 
+                of our dependencies
+        - `poetry show --latest` --> check on our package repository if there is 
+                a new version
+
+        - `poetry env info` --> info about virtual environment. Poetry automatically
+                creates a virtual environment
+        - `poetry env info --path` --> only get the path of the virtual environment
+
+        - `poetry shell` --> provides a shell command that spawns a new shell 
+                directly inside the virtual environment. With that we will now 
+                be able to call pytest command without poetry run in front of it
+
+        - `poetry update` --> updates all dependencies
+        - `poetry update ${package_name} ${package_name}...` --> updates only 
+                specific dependencies
+
+        - `poetry remove ${package_name}` --> removes a package
+        - `poetry remove --group --dev ${package_name}` --> removes a package
+
+        - `poetry install` --> installs all the dependencies defined in the
+                pyproject.toml file
+        - `poetry install --without dev` --> won't install dev dependencies
+        - `poetry install --extras "${package_name} ${package_name}..." --> installs
+                optional (extras) dependencies
+
+        - `poetry run python ${script_name}` --> runs python script in virtual
+                environment that poetry created
+        - `poetry run pytest` --> runs pytest

@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "poet"
+version = "0.1.0"
+description = ""
+authors = ["dskarthick97 <dskarthicksabari@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.28.1"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+pylint = "^2.15.9"
+pytest = "^7.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
